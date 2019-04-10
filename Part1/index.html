@@ -27,10 +27,11 @@ integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw
         Message: {{ message }}
       </div>
     </div>
-
-    <div v-for="item in items" :key="item.id">
+    <!-- todoListExample.itemList.push({ message: 'Baz' })    //pushes new item to bottom of list-->
+    <!-- todoListExample.itemList.pop()   //pops last item -->
+    <div v-for="item in itemList" :key="item.id">
     <ul id="todoList">
-      <li v-for="item in items">
+      <li v-for="item in itemList">
         {{ item.message }}
       </li>
     </ul>
@@ -61,10 +62,10 @@ integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw
 
   <!-- todo list -->
   <script>
- var example1 = new Vue({
+ let todoListExample = new Vue({
   el: '#todoList',
   data: {
-    items: [
+    itemList: [
       { message: 'Finish Part 1' },
       { message: 'Make code pretty' },
       { message: 'Get good grades' }
