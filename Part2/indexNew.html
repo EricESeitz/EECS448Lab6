@@ -13,21 +13,6 @@ integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw
  </head>
  <body>
 
-    <div class="jumbotron">
-        <h1 class="display-4">Hello, world!</h1>
-        <p class="lead">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p>
-        <hr class="my-4">
-        <p>It uses utility classes for typography and spacing to space content out within the larger container.</p>
-         <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a>
-        </div>
-    
-    <!-- app.message = "Whatever!"  - in web console -->
-    <div class="container">
-      <div id="app">
-        Message: {{ message }}
-      </div>
-    </div>
-
    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" 
    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" 
    crossorigin="anonymous"></script>
@@ -42,10 +27,40 @@ integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw
 
   <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 
-Number of stops: <input v-model.number="numStops" type="number" value=10><br>
+    <div id="filteredStops">
+        Number of stops: <input v-model.number="numStops" type="number"><button v-on:click="this.computedFunction" onclick="console.log('Updated')">Update</button><br>'
+    </div>
+
+
+<!--Computed property-->
+<div id="filteredStops">
+  <h3>Computed Stops:</h3>
+  <ul>
+    <li
+      is="filtered-item"
+      v-for="(computedStop, index) in computedStops"
+      v-bind:key="computedStop.id"
+
+      v-bind:id="computedStop.id"
+      v-bind:name="computedStop.name"
+      v-bind:code="computedStop.code"
+      v-bind:description="computedStop.description"
+      v-bind:lat="computedStop.lat"
+      v-bind:lon="computedStop.lon"
+      v-bind:buddy="computedStop.buddy"
+      v-bind:fields="computedStop.fields"
+      v-bind:distance="computedStop.distance"
+
+      v-on:remove="computedStops.splice(index, 1)"
+      
+    ></li>
+  </ul>
+</div>
+<br>
 
 <!-- combine todo list ex and stops-->
 <div id="stopList">
+    <h3>Full list of Stops:</h3>
   <ul>
     <li
       is="todo-item"
@@ -100,7 +115,7 @@ Number of stops: <input v-model.number="numStops" type="number" value=10><br>
             buddy:	null,
             fields:	{},
             distance:	0
-          }]
+          }],          
       },
     mounted: function(){
          // fetch request ex: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
@@ -130,6 +145,55 @@ Number of stops: <input v-model.number="numStops" type="number" value=10><br>
     })
     </script>
 
+  <!--Code for computed, ex: https://vuejs.org/v2/guide/computed.html-->
+    <script>
+      Vue.component('filtered-item', {
+      template: '\
+        <li>\
+          ID: {{ id }}<br>\
+          Name: {{ name }}<br>\
+          Code: {{ code }}<br>\
+          Desc: {{ description }}<br>\
+          Lat: {{ lat }}<br>\
+          Lon: {{ lon }}<br>\
+          Buddy: {{ buddy }}<br>\
+          Fields: {{ fields }}<br>\
+          Distance: {{ distance }}\
+        </li>\
+      ',
+      props: ['id','name','code','description','lat','lon','buddy','fields','distance']
+    })
+    //<button v-on:click="$emit(\'remove\')">Remove</button>\ at end before </li>
+
+    let filteredStops = new Vue({
+    el: '#filteredStops',
+    data: {
+      computedStops: [{
+            id:	0,
+            name:	"default",
+            code:	"default",
+            description:	"default",
+            lat:	0,
+            lon:	0,
+            buddy:	null,
+            fields:	{},
+            distance:	0
+          }],
+          numStops: 10
+    },
+    computed: {
+        // a computed getter
+        computedFunction: function () {
+        // `this` points to the vm instance
+        //testing
+        let tempNumStops = 10;
+        let splicedList = stops.todos.splice(tempNumStops);
+        filteredStops.computeStops = splicedList;
+        return filteredStops.computeStops;
+      }
+    }
+})
+    </script>
 
 </body>
 </html>
