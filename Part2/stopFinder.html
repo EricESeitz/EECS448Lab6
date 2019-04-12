@@ -27,9 +27,7 @@ integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw
 
   <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 
-<!-- combine todo list ex and stops
-(stopList, index) in filteredStops
--->
+<!-- HTML elements of stopList -->
 <div id="stopList">
     <h3>Stops List</h3>
     Number of stops: <input v-model="numStops" type="number" value="10" min="0">
@@ -48,20 +46,8 @@ integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw
     ></li>
   </ul>
 </div>
-<!--
-      v-bind:id="stopList.id"
-      v-bind:name="stopList.name"
-      v-bind:code="stopList.code"
-      v-bind:description="stopList.description"
-      v-bind:lat="stopList.lat"
-      v-bind:lon="stopList.lon"
-      v-bind:buddy="stopList.buddy"
-      v-bind:fields="stopList.fields"
-      v-bind:distance="stopList.distance"
-      v-on:remove="stopLists.splice(index, 1)"
--->
 
-  <!--combine stopListlist and stops-->
+  <!--vue.js elements-->
   <script>
     Vue.component('stopList-item', {
       template: '\
@@ -102,6 +88,7 @@ integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw
             return slicedList;
           }
       },
+      // watchIDLat and watchIdLon from TA (given)
       // Here, we are creating watchers, which are call back functions we call when the variables we watch change in value. So
       // we are creating watchers to watch the variables watchIDLat and watchIDLon. Whenever these variables change, then the function
       // . which updates the distances of the bus stops and sort them, are executed.
@@ -161,10 +148,7 @@ integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw
       created: function () {
         if ("geolocation" in navigator) {
                /* geolocation is available */
-               /* get current geolocation 
-                navigator.geolocation.getCurrentPosition(function(position) {
-                console.log(position.coords.latitude + " " + position.coords.longitude);
-                  */
+
                  /* watch geolocation */
                 let options = {
                   enableHighAccuracy:false,
@@ -174,7 +158,6 @@ integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw
                 navigator.geolocation.watchPosition(function(position) {
                   stops.watchIDLat = position.coords.latitude;
                   stops.watchIDLon = position.coords.longitude;
-                //console.log(position.coords.latitude, position.coords.longitude);
                 console.log("geolocation: ", stops.watchIDLat, stops.watchIDLon);
                 }, function(err){console.log(err);}, options);
             } else {
@@ -183,6 +166,7 @@ integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw
                 }
       },
     mounted: function(){
+         // stops.stopLists = myJson from TA (given)
          // fetch request ex: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
          // This part should be done in mounted life-cycle hook so that it is executed when this Vue
          // object reaches mounted stage. Then, you can just assign the JSON array to the variable.
@@ -195,16 +179,6 @@ integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw
              //stops.addNewstopList();
              stops.stopLists = myJson;
            });
-         // Alternate solution to assigning is to use arrow function operator, since arrow function does
-         // not have "this", then "this" will refer to the parent's "this", which is the Vue object's "this".
-         // If you use function(myJson) {} instead, then the function will have its own "this" and will assign
-         // to its own "this" instead of the parent's "this".
-
-         /*
-          .then((myJson) => {
-             this.stopLists = myJson;
-           });
-         */
 
     }
     })
