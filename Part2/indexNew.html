@@ -27,86 +27,51 @@ integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw
 
   <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 
-    <div id="numOfStops">
-        Number of stops: <input id="numStops" type="number" value="10">
-    </div>
-
-
-<!--Computed property-->
-<div id="filteredStops">
-  <h3>Computed Stops:</h3>
-  <button v-on:click="computedFunction">Update</button>
-  <ul>
-    <li
-      is="filtered-item"
-      v-for="(computedStop, index) in computedStops"
-      v-bind:key="computedStop.id"
-
-      v-bind:id="computedStop.id"
-      v-bind:name="computedStop.name"
-      v-bind:code="computedStop.code"
-      v-bind:description="computedStop.description"
-      v-bind:lat="computedStop.lat"
-      v-bind:lon="computedStop.lon"
-      v-bind:buddy="computedStop.buddy"
-      v-bind:fields="computedStop.fields"
-      v-bind:distance="computedStop.distance"
-
-      v-on:remove="computedStops.splice(index, 1)"
-      
-    ></li>
-  </ul>
-</div>
-<br>
-
 <!-- combine todo list ex and stops-->
 <div id="stopList">
-    <h3>Full list of Stops:</h3>
+    <h3>Stops List</h3>
+    Number of stops: <input v-model="numStops" type="number" value="10">
   <ul>
     <li
-      is="todo-item"
-      v-for="(todo, index) in todos"
-      v-bind:key="todo.id"
-
-      v-bind:id="todo.id"
-      v-bind:name="todo.name"
-      v-bind:code="todo.code"
-      v-bind:description="todo.description"
-      v-bind:lat="todo.lat"
-      v-bind:lon="todo.lon"
-      v-bind:buddy="todo.buddy"
-      v-bind:fields="todo.fields"
-      v-bind:distance="todo.distance"
-
-      v-on:remove="todos.splice(index, 1)"
+      is="stopList-item"
+      v-for="(stopList, index) in filteredStops"
+      v-bind:key="stopList.id"
+      v-bind:name="stopList.name"
+      v-bind:description="stopList.description"
+      v-bind:distance="stopList.distance"
     ></li>
   </ul>
 </div>
-
-  <!--combine todolist and stops-->
+<!--
+      v-bind:id="stopList.id"
+      v-bind:name="stopList.name"
+      v-bind:code="stopList.code"
+      v-bind:description="stopList.description"
+      v-bind:lat="stopList.lat"
+      v-bind:lon="stopList.lon"
+      v-bind:buddy="stopList.buddy"
+      v-bind:fields="stopList.fields"
+      v-bind:distance="stopList.distance"
+      v-on:remove="stopLists.splice(index, 1)"
+-->
+  <!--combine stopListlist and stops-->
   <script>
-    Vue.component('todo-item', {
+    Vue.component('stopList-item', {
       template: '\
-        <li>\
-          ID: {{ id }}<br>\
-          Name: {{ name }}<br>\
-          Code: {{ code }}<br>\
-          Desc: {{ description }}<br>\
-          Lat: {{ lat }}<br>\
-          Lon: {{ lon }}<br>\
-          Buddy: {{ buddy }}<br>\
-          Fields: {{ fields }}<br>\
-          Distance: {{ distance }}\
-        </li>\
+        <div class="card" style="width: 18rem;">\
+        <div class="card-body">\
+        <h5 class="card-title">{{ name }}</h5>\
+        <p class="card-text">{{ description }}</p>\
+        </div>\
+        </div>\
       ',
       props: ['id','name','code','description','lat','lon','buddy','fields','distance']
     })
-    //<button v-on:click="$emit(\'remove\')">Remove</button>\ at end before </li>
 
     let stops = new Vue({
       el: '#stopList',
       data: {
-        todos: [{
+        stopLists: [{
             id:	0,
             name:	"default",
             code:	"default",
@@ -116,7 +81,13 @@ integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw
             buddy:	null,
             fields:	{},
             distance:	0
-          }],          
+          }],
+          numStops: 10          
+      },
+      computed: {
+          filteredStops: function(){
+            return this.stopLists.slice(0, this.numStops);
+          }
       },
     mounted: function(){
          // fetch request ex: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
@@ -128,8 +99,8 @@ integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw
            })
            .then(function(myJson) {
              //console.log(JSON.stringify(myJson));
-             //stops.addNewTodo();
-             stops.todos = myJson;
+             //stops.addNewstopList();
+             stops.stopLists = myJson;
            });
          // Alternate solution to assigning is to use arrow function operator, since arrow function does
          // not have "this", then "this" will refer to the parent's "this", which is the Vue object's "this".
@@ -138,66 +109,11 @@ integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw
 
          /*
           .then((myJson) => {
-             this.todos = myJson;
+             this.stopLists = myJson;
            });
          */
 
     }
-    })
-    </script>
-
-  <!--Code for computed, ex: https://vuejs.org/v2/guide/computed.html-->
-    <script>
-      Vue.component('filtered-item', {
-      template: '\
-        <li>\
-          ID: {{ id }}<br>\
-          Name: {{ name }}<br>\
-          Code: {{ code }}<br>\
-          Desc: {{ description }}<br>\
-          Lat: {{ lat }}<br>\
-          Lon: {{ lon }}<br>\
-          Buddy: {{ buddy }}<br>\
-          Fields: {{ fields }}<br>\
-          Distance: {{ distance }}\
-        </li>\
-      ',
-      props: ['id','name','code','description','lat','lon','buddy','fields','distance']
-    })
-    //<button v-on:click="$emit(\'remove\')">Remove</button>\ at end before </li>
-
-    let filteredStops = new Vue({
-    el: '#filteredStops',
-    data: {
-      computedStops: [{
-            id:	0,
-            name:	"default",
-            code:	"default",
-            description:	"default",
-            lat:	0,
-            lon:	0,
-            buddy:	null,
-            fields:	{},
-            distance:	0
-          }],
-          //numStops: '10'
-    },
-
-    created: function(){
-        //this.computedFunction()
-      },
-
-    methods: {
-        computedFunction: function () {
-        // `this` points to the vm instance
-        let tempNumStops = document.getElementById("numStops").value;
-        console.log("Number of stops: " + tempNumStops);
-        let splicedList = stops.todos.slice(0, tempNumStops); //returns array index from 0 to tempNumStops
-        console.log("spliced: " + JSON.stringify(splicedList));
-        filteredStops.computedStops = splicedList;
-          }
-      }
-
     })
     </script>
 
