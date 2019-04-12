@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+   <meta charset="UTF-8" />
+   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+   <title>Vue Lab</title>
+   <link
+     rel="stylesheet"    href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+     crossorigin="anonymous"
+   />
+ </head>
+ <body>
+
+   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" 
+   integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" 
+   crossorigin="anonymous"></script>
+   <script
+   src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+   integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+   crossorigin="anonymous"></script>
+ <script
+   src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+   integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+   crossorigin="anonymous"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+<!-- combine todo list ex and stops
+(stopList, index) in filteredStops
+-->
+<div id="stopList">
+    <h3>Stops List</h3>
+    Number of stops: <input v-model="numStops" type="number" value="10" min="0">
+  <ul>
+    <li
+      is="stopList-item"
+      v-for="(stopList, index) in filteredStops"   
+      v-for="watchIDLat in stops"   
+      v-for="watchIDLon in stops"   
+      v-bind:key="stopList.id"
+      v-bind:name="stopList.name"
+      v-bind:description="stopList.description"
+      v-bind:distance="distanceFunction(stopList.lat, stopList.lon, watchIDLat, watchIDLon)"
+      v-bind:lat="stopList.lat"
+      v-bind:lon="stopList.lon"
+    ></li>
+  </ul>
+</div>
+<!--
+      v-bind:id="stopList.id"
+      v-bind:name="stopList.name"
+      v-bind:code="stopList.code"
+      v-bind:description="stopList.description"
+      v-bind:lat="stopList.lat"
+      v-bind:lon="stopList.lon"
+      v-bind:buddy="stopList.buddy"
+      v-bind:fields="stopList.fields"
+      v-bind:distance="stopList.distance"
+      v-on:remove="stopLists.splice(index, 1)"
+-->
+
+  <!--combine stopListlist and stops-->
+  <script>
+    Vue.component('stopList-item', {
+      template: '\
+        <div class="card" style="width: 18rem;">\
+        <div class="card-body">\
+        <h5 class="card-title">{{ name }}</h5>\
+        <p class="card-text">{{ description }}</p>\
+        <p class="card-text">{{ distance }} km</p>\
+        </div>\
+        </div>\
+      ',
+      props: ['id','name','code','description','lat','lon','buddy','fields','distance']
+    })
+
+    let stops = new Vue({
+      el: '#stopList',
+      data: {
+        stopLists: [{
+            id:	0,
+            name:	"default",
+            code:	"default",
+            description:	"default",
+            lat:	0,
+            lon:	0,
+            buddy:	null,
+            fields:	{},
+            distance:	0
+          }],
+          watchIDLat: 0,
+          watchIDLon: 0,
+          numStops: 10,
+
+      },
+      computed: {
+          filteredStops: function(){
+
+            let slicedList = this.stopLists.slice(0, this.numStops);
+            return slicedList;
+          }
+      },
+      // Here, we are creating watchers, which are call back functions we call when the variables we watch change in value. So
+      // we are creating watchers to watch the variables watchIDLat and watchIDLon. Whenever these variables change, then the function
+      // . which updates the distances of the bus stops and sort them, are executed.
+      watch: {
+          watchIDLat: function(){
+              // Update the distances for the stops in stopLists
+              for (var i = 0; i < this.stopLists.length; i++){
+                  this.stopLists[i].distance = this.distanceFunction(this.watchIDLat, this.watchIDLon, this.stopLists[i].lat, this.stopLists[i].lon);
+              }
+
+              // Sort the array after that
+              this.stopLists.sort(function(a, b){ return a.distance - b.distance })
+            },
+          watchIDLon: function(){
+              // Update the distances for the stops in stopLists
+              for (var i = 0; i < this.stopLists.length; i++){
+                  this.stopLists[i].distance = this.distanceFunction(this.watchIDLat, this.watchIDLon, this.stopLists[i].lat, this.stopLists[i].lon);
+              }
+
+              // Sort the array after that
+              this.stopLists.sort(function(a, b){ return a.distance - b.distance })
+          }
+      },
+      methods: {
+        distanceFunction: function(stopLat, stopLon, userLat, userLon){
+
+          // Conversion from here: https://stackoverflow.com/questions/13840516/how-to-find-my-distance-to-a-known-location-in-javascript
+          //lon/lat 1 = user position
+          //lon/lat 2 = position of stop (fixed)
+          /** Converts numeric degrees to radians */
+          if (typeof(Number.prototype.toRad) === "undefined") {
+              Number.prototype.toRad = function() {
+              return this * Math.PI / 180;
+                }
+              }
+
+          lat2 = stopLat;
+          lon2 = stopLon;
+          console.log("Stop coord Lat Long: " , lat2, lon2);
+          lat1 = userLat;
+          lon1 = userLon;
+          console.log("user coord Lat Long: " , lat1, lon1);
+
+          let R = 6371; // Radius of the earth in km
+          let dLat = (lat2-lat1).toRad();  // Javascript functions in radians
+          let dLon = (lon2-lon1).toRad(); 
+          let a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+          Math.cos(lat1.toRad()) * Math.cos(lat2.toRad()) * 
+          Math.sin(dLon/2) * Math.sin(dLon/2); 
+          let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+          let d = R * c; // Distance in km
+          d = Math.round(d * 100) / 100;  //round d to 2 decimal places
+          return d; 
+          }
+      },
+
+      created: function () {
+        if ("geolocation" in navigator) {
+               /* geolocation is available */
+               /* get current geolocation 
+                navigator.geolocation.getCurrentPosition(function(position) {
+                console.log(position.coords.latitude + " " + position.coords.longitude);
+                  */
+                 /* watch geolocation */
+                let options = {
+                  enableHighAccuracy:false,
+                  maximumAge:Infinity, 
+                  timeout:60000
+                };
+                navigator.geolocation.watchPosition(function(position) {
+                  stops.watchIDLat = position.coords.latitude;
+                  stops.watchIDLon = position.coords.longitude;
+                //console.log(position.coords.latitude, position.coords.longitude);
+                console.log("geolocation: ", stops.watchIDLat, stops.watchIDLon);
+                }, function(err){console.log(err);}, options);
+            } else {
+                /* geolocation IS NOT available */
+              console.log("Geolocation not available.");
+                }
+      },
+    mounted: function(){
+         // fetch request ex: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+         // This part should be done in mounted life-cycle hook so that it is executed when this Vue
+         // object reaches mounted stage. Then, you can just assign the JSON array to the variable.
+         fetch('https://utils.pauliankline.com/stops.json')
+           .then(function(response) {
+             return response.json();
+           })
+           .then(function(myJson) {
+             //console.log(JSON.stringify(myJson));
+             //stops.addNewstopList();
+             stops.stopLists = myJson;
+           });
+         // Alternate solution to assigning is to use arrow function operator, since arrow function does
+         // not have "this", then "this" will refer to the parent's "this", which is the Vue object's "this".
+         // If you use function(myJson) {} instead, then the function will have its own "this" and will assign
+         // to its own "this" instead of the parent's "this".
+
+         /*
+          .then((myJson) => {
+             this.stopLists = myJson;
+           });
+         */
+
+    }
+    })
+    </script>
+
+</body>
+</html>
