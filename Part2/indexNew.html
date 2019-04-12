@@ -27,14 +27,15 @@ integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw
 
   <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 
-    <div id="filteredStops">
-        Number of stops: <input v-model.number="numStops" type="number"><button v-on:click="this.computedFunction" onclick="console.log('Updated')">Update</button><br>'
+    <div id="numOfStops">
+        Number of stops: <input id="numStops" type="number" value="10">
     </div>
 
 
 <!--Computed property-->
 <div id="filteredStops">
   <h3>Computed Stops:</h3>
+  <button v-on:click="computedFunction">Update</button>
   <ul>
     <li
       is="filtered-item"
@@ -126,7 +127,7 @@ integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw
              return response.json();
            })
            .then(function(myJson) {
-             console.log(JSON.stringify(myJson));
+             //console.log(JSON.stringify(myJson));
              //stops.addNewTodo();
              stops.todos = myJson;
            });
@@ -179,20 +180,25 @@ integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw
             fields:	{},
             distance:	0
           }],
-          numStops: 10
+          //numStops: '10'
     },
-    computed: {
-        // a computed getter
+
+    created: function(){
+        //this.computedFunction()
+      },
+
+    methods: {
         computedFunction: function () {
         // `this` points to the vm instance
-        //testing
-        let tempNumStops = 10;
-        let splicedList = stops.todos.splice(tempNumStops);
-        filteredStops.computeStops = splicedList;
-        return filteredStops.computeStops;
+        let tempNumStops = document.getElementById("numStops").value;
+        console.log("Number of stops: " + tempNumStops);
+        let splicedList = stops.todos.slice(0, tempNumStops); //returns array index from 0 to tempNumStops
+        console.log("spliced: " + JSON.stringify(splicedList));
+        filteredStops.computedStops = splicedList;
+          }
       }
-    }
-})
+
+    })
     </script>
 
 </body>
