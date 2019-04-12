@@ -182,22 +182,35 @@ integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw
             fields:	{},
             distance:	0
           }]
-      }
+      },
+    mounted: function(){
+         // fetch request ex: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+         // This part should be done in mounted life-cycle hook so that it is executed when this Vue
+         // object reaches mounted stage. Then, you can just assign the JSON array to the variable.
+         fetch('https://utils.pauliankline.com/stops.json')
+           .then(function(response) {
+             return response.json();
+           })
+           .then(function(myJson) {
+             console.log(JSON.stringify(myJson));
+             //stops.addNewTodo();
+             stops.todos = myJson;
+           });
+         // Alternate solution to assigning is to use arrow function operator, since arrow function does
+         // not have "this", then "this" will refer to the parent's "this", which is the Vue object's "this".
+         // If you use function(myJson) {} instead, then the function will have its own "this" and will assign
+         // to its own "this" instead of the parent's "this".
+
+         /*
+          .then((myJson) => {
+             this.todos = myJson;
+           });
+         */
+
+    }
     })
     </script>
 
-  <!-- fetch request ex: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch -->
-  <script> 
-  fetch('https://utils.pauliankline.com/stops.json')
-    .then(function(response) {
-      return response.json();
-    })
-    .then(function(myJson) {
-      console.log(JSON.stringify(myJson));
-      //stops.addNewTodo();
-      stops.todos.push({ myJson })
-    });
-    </script>
 
 </body>
 </html>
