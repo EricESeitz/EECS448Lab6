@@ -27,18 +27,24 @@ integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw
 
   <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 
-<!-- combine todo list ex and stops-->
+<!-- combine todo list ex and stops
+(stopList, index) in filteredStops
+-->
 <div id="stopList">
     <h3>Stops List</h3>
     Number of stops: <input v-model="numStops" type="number" value="10">
   <ul>
     <li
       is="stopList-item"
-      v-for="(stopList, index) in filteredStops"
+      v-for="(stopList, index) in filteredStops"   
+      v-for="watchIDLat in stops"   
+      v-for="watchIDLon in stops"   
       v-bind:key="stopList.id"
       v-bind:name="stopList.name"
       v-bind:description="stopList.description"
-      v-bind:distance="stopList.distance"
+      v-bind:distance="distanceFunction(stopList.lat, stopList.lon, watchIDLat, watchIDLon)"
+      v-bind:lat="stopList.lat"
+      v-bind:lon="stopList.lon"
     ></li>
   </ul>
 </div>
@@ -54,6 +60,7 @@ integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw
       v-bind:distance="stopList.distance"
       v-on:remove="stopLists.splice(index, 1)"
 -->
+
   <!--combine stopListlist and stops-->
   <script>
     Vue.component('stopList-item', {
@@ -62,6 +69,9 @@ integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw
         <div class="card-body">\
         <h5 class="card-title">{{ name }}</h5>\
         <p class="card-text">{{ description }}</p>\
+        <p class="card-text">{{ distance }} km</p>\
+        <p class="card-text">{{ lat }}</p>\
+        <p class="card-text">{{ lon }}</p>\
         </div>\
         </div>\
       ',
@@ -82,12 +92,69 @@ integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw
             fields:	{},
             distance:	0
           }],
-          numStops: 10          
+          watchIDLat: 0,
+          watchIDLon: 0,
+          numStops: 10,
+
       },
       computed: {
           filteredStops: function(){
+
             return this.stopLists.slice(0, this.numStops);
           }
+      },
+
+      methods: {
+        distanceFunction: function(stopLat, stopLon, userLat, userLon){
+
+          //https://stackoverflow.com/questions/13840516/how-to-find-my-distance-to-a-known-location-in-javascript
+          //lon/lat 1 = user position
+          //lon/lat 2 = position of stop (fixed)
+          /** Converts numeric degrees to radians */
+          if (typeof(Number.prototype.toRad) === "undefined") {
+              Number.prototype.toRad = function() {
+              return this * Math.PI / 180;
+                }
+              }
+
+          lat2 = stopLat;
+          lon2 = stopLon;
+          console.log("Stop coord Lat Long: " , lat2, lon2);
+          lat1 = userLat; //position.coords.latitude;
+          lon1 = userLon; //position.coords.longitude;
+          console.log("user coord Lat Long: " , lat1, lon1);
+
+          let R = 6371; // Radius of the earth in km
+          let dLat = (lat2-lat1).toRad();  // Javascript functions in radians
+          let dLon = (lon2-lon1).toRad(); 
+          let a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+          Math.cos(lat1.toRad()) * Math.cos(lat2.toRad()) * 
+          Math.sin(dLon/2) * Math.sin(dLon/2); 
+          let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+          let d = R * c; // Distance in km
+          d = Math.round(d * 100) / 100;  //round d to 2 decimal places
+          return d; 
+          }
+      },
+
+      created: function () {
+        if ("geolocation" in navigator) {
+               /* geolocation is available */
+               /* get current geolocation 
+                navigator.geolocation.getCurrentPosition(function(position) {
+                console.log(position.coords.latitude + " " + position.coords.longitude);
+                  */
+                 /* watch geolocation */
+                navigator.geolocation.watchPosition(function(position) {
+                  stops.watchIDLat = position.coords.latitude;
+                  stops.watchIDLon = position.coords.longitude;
+                //console.log(position.coords.latitude, position.coords.longitude);
+                console.log("geolocation: ", stops.watchIDLat, stops.watchIDLon);
+                });
+            } else {
+                /* geolocation IS NOT available */
+              console.log("Geolocation not available.");
+                }
       },
     mounted: function(){
          // fetch request ex: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
