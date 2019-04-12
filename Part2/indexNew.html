@@ -42,132 +42,51 @@ integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw
 
   <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 
-  <script>   
-    const app = new Vue({
-      el: '#app',
-      data: {
-        message: 'Hello Vue!'
-      }
-    })
-  </script>
-<!-- To do list ex
-<div id="todo-list-example">
-  <form v-on:submit.prevent="addNewTodo">
-    <label for="new-todo">Add a todo</label>
-    <input
-      v-model="newTodoText"
-      id="new-todo"
-      placeholder="E.g. Feed the cat"
-    >
-    <button>Add</button>
-  </form>
+Number of stops: <input v-model.number="numStops" type="number" value=10><br>
+
+<!-- combine todo list ex and stops-->
+<div id="stopList">
   <ul>
     <li
       is="todo-item"
       v-for="(todo, index) in todos"
       v-bind:key="todo.id"
-      v-bind:title="todo.title"
+
+      v-bind:id="todo.id"
+      v-bind:name="todo.name"
+      v-bind:code="todo.code"
+      v-bind:description="todo.description"
+      v-bind:lat="todo.lat"
+      v-bind:lon="todo.lon"
+      v-bind:buddy="todo.buddy"
+      v-bind:fields="todo.fields"
+      v-bind:distance="todo.distance"
+
       v-on:remove="todos.splice(index, 1)"
     ></li>
   </ul>
 </div>
--->
-
-<!-- combine todo list ex and stops-->
-<div id="stopList">
-  <form v-on:submit.prevent="addNewTodo">
-    <label for="new-todo">Add a stop</label>
-    <input
-      id="new-todo"
-      placeholder="placeholder"
-    >
-    <button>Add</button>
-  </form>
-  <ul>
-    <li
-      is="todo-item"
-      v-for="(todo, index) in todos"
-      v-bind:key="todos.id"
-      v-on:remove="todos.splice(index, 1)"
-    > {{ todo }} </li>
-  </ul>
-</div>
-
-  <!-- stops property 
-  <script>
- let stops = new Vue({
-  el: '#stopList',
-  data: {
-    stopList: [    ]
-  }, 
-  created: function () {
-    // `this` points to the vm instance
-    console.log('a is: ' + this.a)
-    
-  }
-
-})
-  </script>
-
-  -->
-
-  <!--Todo list test
-  <script>
-  Vue.component('todo-item', {
-    template: '\
-      <li>\
-        {{ title }}\
-        <button v-on:click="$emit(\'remove\')">Remove</button>\
-      </li>\
-    ',
-    props: ['title']
-  })
-  
-  new Vue({
-    el: '#todo-list-example',
-    data: {
-      newTodoText: '',
-      todos: [
-        {
-          id: 1,
-          title: 'Do the dishes',
-        },
-        {
-          id: 2,
-          title: 'Take out the trash',
-        },
-        {
-          id: 3,
-          title: 'Mow the lawn'
-        }
-      ],
-      nextTodoId: 4
-    },
-    methods: {
-      addNewTodo: function () {
-        this.todos.push({
-          id: this.nextTodoId++,
-          title: this.newTodoText
-        })
-        this.newTodoText = ''
-      }
-    }
-  })
-  </script>
-    -->
 
   <!--combine todolist and stops-->
   <script>
     Vue.component('todo-item', {
       template: '\
         <li>\
-          {{ title }}\
-          <button v-on:click="$emit(\'remove\')">Remove</button>\
+          ID: {{ id }}<br>\
+          Name: {{ name }}<br>\
+          Code: {{ code }}<br>\
+          Desc: {{ description }}<br>\
+          Lat: {{ lat }}<br>\
+          Lon: {{ lon }}<br>\
+          Buddy: {{ buddy }}<br>\
+          Fields: {{ fields }}<br>\
+          Distance: {{ distance }}\
         </li>\
       ',
-      props: ['title']
+      props: ['id','name','code','description','lat','lon','buddy','fields','distance']
     })
-    
+    //<button v-on:click="$emit(\'remove\')">Remove</button>\ at end before </li>
+
     let stops = new Vue({
       el: '#stopList',
       data: {
