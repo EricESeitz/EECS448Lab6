@@ -98,14 +98,15 @@ integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw
       computed: {
           filteredStops: function(){
 
-            return this.stopLists.slice(0, this.numStops);
+            let slicedList = this.stopLists.slice(0, this.numStops);
+            return slicedList;
           }
       },
 
       methods: {
         distanceFunction: function(stopLat, stopLon, userLat, userLon){
 
-          //https://stackoverflow.com/questions/13840516/how-to-find-my-distance-to-a-known-location-in-javascript
+          // Conversion from here: https://stackoverflow.com/questions/13840516/how-to-find-my-distance-to-a-known-location-in-javascript
           //lon/lat 1 = user position
           //lon/lat 2 = position of stop (fixed)
           /** Converts numeric degrees to radians */
@@ -118,8 +119,8 @@ integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw
           lat2 = stopLat;
           lon2 = stopLon;
           console.log("Stop coord Lat Long: " , lat2, lon2);
-          lat1 = userLat; //position.coords.latitude;
-          lon1 = userLon; //position.coords.longitude;
+          lat1 = userLat;
+          lon1 = userLon;
           console.log("user coord Lat Long: " , lat1, lon1);
 
           let R = 6371; // Radius of the earth in km
